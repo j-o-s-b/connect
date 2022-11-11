@@ -4,6 +4,6 @@ Connect is a Wellcome Mental Health data prize funded project that uses latent g
 
 Connect is a collaboration between the National Centre for Social Research, the University of Groningen, University College London, ETH Zurich, the University of Amsterdam and the Global Mental Health Peer Network.
 
-You can read more at https://connectdata.org
+You can read more at https://connectdata.org.uk
 
-There is a live demo at https://app.connectdata.org
+There is a live demo at https://app.connectdata.org.uk
