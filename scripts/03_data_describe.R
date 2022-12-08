@@ -16,19 +16,21 @@ list.files("./scripts/functions/", full.names = T) %>%
 # Outcomes -------------------------------------
 
 dep_change <- alspac_long %>% 
-  select(age, anxiety, depression) %>% 
+  select(age, anxiety, depression, depression_smfq) %>% 
   group_by(age) %>% 
   summarise(Anxiety_prop = mean(anxiety, na.rm = T),
             Anxiety_prop_miss = mean(is.na(anxiety)),
             Depression_prop = mean(depression, na.rm = T),
-            Depression_prop_miss = mean(is.na(depression))) %>% 
-  na.omit()
+            Depression_prop_miss = mean(is.na(depression)),
+            Depression_smfq_prop = mean(depression_smfq, na.rm = T),
+            Depression_smfq_miss = mean(is.na(depression_smfq)))
 
 dep_change %>% 
   select(age, ends_with("prop")) %>% 
   gather(value = value, key = var, -age) %>% 
   mutate(var = str_remove(var, "_prop"),
          age = as.factor(age)) %>% 
+  na.omit() %>% 
   ggplot(aes(age, value, color = var, group = var)) + 
   geom_line() +
   geom_point() +
@@ -36,7 +38,6 @@ dep_change %>%
   scale_y_continuous(labels = scales::percent) +
   labs(x = "Age",
        y = "Percentage of cases",
-       caption = "*Anxiety at age 17 inconsistent",
        color = "")
 
 ggsave("./output/fig/dep_trends.png", dpi = 300)
@@ -274,34 +275,37 @@ bully_var <- c("bullying_victim_fct",
                "bullying_often_bullied_fct",
                "bullying_frequency_bullied_fct")
 
-alspac_long <- alspac_long %>% 
-  select(uniqid, age, anxiety, depression, bullying_victim_fct) %>%
+alspac_long2 <- alspac_long %>% 
+  select(uniqid, age, anxiety, depression, bullying_victim_fct,
+         depression_smfq) %>%
   group_by(uniqid) %>% 
   mutate(bully_victim_8 = ifelse(age == 8 & bullying_victim_fct == "Yes",
                                  1, 0),
          bully_victim_8 = max(bully_victim_8, na.rm = T),
          bully_victim_10 = ifelse(age == 10 & bullying_victim_fct == "Yes",
-                                 1, 0),
+                                  1, 0),
          bully_victim_10 = max(bully_victim_10, na.rm = T)) %>% 
   ungroup()
 
 
 
-trends_bully_8 <- alspac_long %>% 
+trends_bully_8 <- alspac_long2 %>% 
   group_by(age, bully_victim_8) %>% 
   summarise(Anxiety_prop = mean(anxiety, na.rm = T),
-            Depression_prop = mean(depression, na.rm = T)) %>% 
-  filter(!is.nan(Anxiety_prop)) %>% 
+            Depression_prop = mean(depression, na.rm = T),
+            Depress_smfq_prop = mean(depression_smfq, na.rm = T)) %>% 
+  #  filter(!is.nan(Anxiety_prop)) %>% 
   rename(bully = bully_victim_8) %>% 
   mutate(bully_age = 8) %>% 
   ungroup()
 
 
-trends_bully_10 <- alspac_long %>% 
+trends_bully_10 <- alspac_long2 %>% 
   group_by(age, bully_victim_10) %>% 
   summarise(Anxiety_prop = mean(anxiety, na.rm = T),
-            Depression_prop = mean(depression, na.rm = T)) %>% 
-  filter(!is.nan(Anxiety_prop)) %>% 
+            Depression_prop = mean(depression, na.rm = T),
+            Depress_smfq_prop = mean(depression_smfq, na.rm = T)) %>% 
+  #  filter(!is.nan(Anxiety_prop)) %>% 
   rename(bully = bully_victim_10) %>% 
   mutate(bully_age = 10) %>% 
   ungroup()
@@ -310,7 +314,8 @@ trends_bully <- rbind(trends_bully_8, trends_bully_10)
 
 
 trends_bully %>% 
-  gather(value = value, key = var, -age, -bully, -bully_age) %>% 
+  gather(value = value, key = var, -age, -bully, -bully_age) %>%
+  na.omit() %>% 
   mutate(var = str_remove(var, "_prop"),
          age = age,
          bully = ifelse(bully == 1, "Yes", "No"),
@@ -329,7 +334,6 @@ trends_bully %>%
   scale_x_continuous(breaks = unique(trends_bully$age)) +
   labs(x = "Age",
        y = "Percentage of cases",
-       caption = "*Anxiety at age 17 inconsistent",
        color = "Bullied") 
 
 ggsave("./output/fig/dep_trends_bully.png", dpi = 100)
