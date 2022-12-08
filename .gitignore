@@ -2,3 +2,5 @@
 *.Rproj
 .Rproj.user/8167C442/sources/s-3B6448AD/lock_file
 .Rproj.user/
+*.rds
+.Rhistory
