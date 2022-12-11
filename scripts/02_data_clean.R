@@ -21,7 +21,7 @@ list.files("./scripts/functions/", full.names = T) %>%
   map(source)
 
 # load data
-alspac_r <- read_rds("./data/clean/alspac_reduced_07.12.22.rds")
+alspac_r <- read_rds("./data/clean/alspac_reduced_09.12.22.rds")
 
 # explore data
 glimpse(alspac_r)
@@ -32,12 +32,26 @@ alspac_r_small <- alspac_r %>%
   select(uniqid, starts_with("anxiety"), starts_with("bullying"),
          starts_with("bereavement"), starts_with("depression"), 
          starts_with("family"), starts_with("friends"),
-         starts_with("life"), 
+         starts_with("life"), starts_with("childcare"),
          starts_with("school"), starts_with("parent"),
-         starts_with("peer"), starts_with("social"),
-         starts_with("loneliness"), starts_with("romantic"),
+         starts_with("peer"), starts_with("social"), starts_with("sibling"),
+         starts_with("romantic"), starts_with("relationship"),
          starts_with("religion"), starts_with("neighbour"),
          -starts_with("school_enjoys"), -contains("inconsistent"))
+
+
+# rename life score so we can reshape it to long
+alspac_r_small <- alspac_r_small %>% 
+  rename_at(vars(starts_with("life_score")),
+            ~str_replace(., "since_.+_age", "since_age")) 
+
+# rename childcare_frequency_child_sees_grandparents_age_5y5m to shift to next 
+# year
+alspac_r_small <- rename(alspac_r_small,
+                         childcare_frequency_child_sees_grandparents_age_5y7m =
+                           childcare_frequency_child_sees_grandparents_age_5y5m)
+
+
 
 glimpse(alspac_r_small)
 
@@ -218,6 +232,41 @@ count(alspac_long, friends_whether_any_close_friend)
 
 
 
+# new vars (09.12)
+
+# make factors
+alspac_long <- alspac_long %>% 
+  mutate_at(vars(friends_yps_friends_fall_out_with_them,
+                 friends_friends_support_yp_when_they_need_them,
+                 friends_friends_put_yp_down_in_front_of_others,
+                 friends_friends_make_yp_feel_confident,
+                 friends_child_has_one_good_friend_last_six_months,
+                 friends_ch_one_good_friend_past,
+                 friends_yp_has_a_best_friend),
+            list("fct" = ~factorise(.))) %>% 
+  mutate(friends_yp_has_a_best_friend_fct = 
+           fct_recode(friends_yp_has_a_best_friend_fct, 
+                      NULL = "Don't know"))
+
+
+count(alspac_long, friends_yps_friends_fall_out_with_them,
+      friends_yps_friends_fall_out_with_them_fct)
+count(alspac_long, friends_friends_support_yp_when_they_need_them,
+      friends_friends_support_yp_when_they_need_them_fct)
+count(alspac_long, friends_friends_put_yp_down_in_front_of_others,
+      friends_friends_put_yp_down_in_front_of_others_fct)
+count(alspac_long, friends_friends_make_yp_feel_confident,
+      friends_friends_make_yp_feel_confident_fct)
+count(alspac_long, friends_child_has_one_good_friend_last_six_months,
+      friends_child_has_one_good_friend_last_six_months_fct)
+count(alspac_long, friends_ch_one_good_friend_past,
+      friends_ch_one_good_friend_past_fct)
+count(alspac_long, friends_yp_has_a_best_friend,
+      friends_yp_has_a_best_friend_fct)
+
+count(alspac_long, friends_whether_any_close_friend)
+
+
 
 # school -------------------
 
@@ -252,9 +301,7 @@ alspac_long <- mutate(alspac_long,
                         factorise(school_get_on_with_classmates),
                       school_feel_popular_fct = 
                         factorise(school_feel_popular),
-                      school_teacher_fair_fct = 
-                        factorise(school_teacher_fair),
-                      
+
                       school_schoolmates_accept_them_fct = 
                         factorise(school_schoolmates_accept_them),
                       school_feel_lonely_fct = 
@@ -310,7 +357,7 @@ count(alspac_long, school_frightened_by_schoolmates,
 count(alspac_long, school_feel_popular, school_feel_popular_fct)
 count(alspac_long, school_get_on_with_classmates, 
       school_get_on_with_classmates_fct)
-count(alspac_long, school_teacher_fair, school_teacher_fair_fct)
+
 
 
 count(alspac_long, school_schoolmates_accept_them,
@@ -324,8 +371,6 @@ count(alspac_long, school_people_depend_on_them,
 
 
 
-
-
 # parents ---------------
 
 
@@ -333,6 +378,7 @@ count(alspac_long, school_people_depend_on_them,
 
 qplot(alspac_long$parent_networks_mother_social_support_score)
 qplot(alspac_long$parent_networks_partner_social_networks_score)
+qplot(alspac_long$parent_networks_partner_social_support_score)
 
 
 
@@ -351,13 +397,6 @@ count(alspac_long, social_discord)
 
 
 
-# loneliness -------------------
-# data clean
-alspac_long <- mutate(alspac_long,
-                      loneliness_frequency_fct = 
-                        factorise(loneliness_frequency))
-
-count(alspac_long, loneliness_frequency, loneliness_frequency_fct)
 
 
 # romantic ----------------
@@ -408,65 +447,11 @@ alspac_long %>%
   names()
 
 
-alspac_long <- alspac_long %>% 
-  mutate_at(vars(neighbour_mother_neighourhood_opinion,
-                 neighbour_burglary_worries_dad,
-                 neighbour_mugging_worries_dad,
-                 neighbour_sex_assault_pestering_worries_dad,
-                 neighbour_vandalism_worries_dad,
-                 neighbour_dad_lively_neighbourhood,
-                 neighbour_dad_friendly_neighbourhood,
-                 neighbour_dad_noisy_neighbourhood,
-                 neighbour_dad_clean_neighbourhood,
-                 neighbour_dad_attractive_neighbourhood,
-                 neighbour_dad_polluted_neighbourhood),
-            list("fct" = ~factorise(.)))
 
 count(alspac_long, neighbour_stress_score) %>% print(n = 100)
 qplot(alspac_long$neighbour_stress_score)
 
-count(alspac_long, neighbour_mother_neighourhood_opinion,
-      neighbour_mother_neighourhood_opinion_fct)
 
-# to code and describe
-# count(alspac_long, neighbour_burglary_worries_mother)
-# count(alspac_long, neighbour_mugging_worries_mother)
-# count(alspac_long, neighbour_sex_assault_pestering_worries_mother)
-# count(alspac_long, neighbour_vandalism_worries_mother)
-# count(alspac_long, neighbour_lively_neighbourhood)
-# count(alspac_long, neighbour_friendly_neighbourhood)
-# count(alspac_long, neighbour_noisy_neighbourhood)
-# count(alspac_long, neighbour_clean_neighbourhood)
-# count(alspac_long, neighbour_attractive_neighbourhood)
-# count(alspac_long, neighbour_polluted_neighbourhood)
-# count(alspac_long, neighbour_neighbourhood_index)
-# count(alspac_long, neighbour_dads_opinion_of_neighbourhood)
-
-
-
-
-
-
-count(alspac_long, neighbour_burglary_worries_dad,
-      neighbour_burglary_worries_dad_fct)
-count(alspac_long, neighbour_mugging_worries_dad,
-      neighbour_mugging_worries_dad_fct)
-count(alspac_long, neighbour_sex_assault_pestering_worries_dad,
-      neighbour_sex_assault_pestering_worries_dad_fct)
-count(alspac_long, neighbour_vandalism_worries_dad,
-      neighbour_vandalism_worries_dad_fct)
-count(alspac_long, neighbour_dad_lively_neighbourhood,
-      neighbour_dad_lively_neighbourhood_fct)
-count(alspac_long, neighbour_dad_friendly_neighbourhood,
-      neighbour_dad_friendly_neighbourhood_fct)
-count(alspac_long, neighbour_dad_noisy_neighbourhood,
-      neighbour_dad_noisy_neighbourhood_fct)
-count(alspac_long, neighbour_dad_clean_neighbourhood,
-      neighbour_dad_clean_neighbourhood_fct)
-count(alspac_long, neighbour_dad_attractive_neighbourhood,
-      neighbour_dad_attractive_neighbourhood_fct)
-count(alspac_long, neighbour_dad_polluted_neighbourhood,
-      neighbour_dad_polluted_neighbourhood_fct)
 
 
 # family ----
@@ -525,20 +510,377 @@ count(alspac_long, family_parent_child_rel_quality)
 qplot(alspac_long$family_parent_child_rel_quality) # skewed
 
 
-# bereavement ------
+# new vars (09.12)
 
+# continious
+# family_overall_parenting_score
+# family_partner_parenting_score
+# family_mother_parenting_score
+# family_female_parenting_score
+# family_male_parenting_score
+
+count(alspac_long, family_overall_parenting_score)
+qplot(alspac_long$family_overall_parenting_score)
+
+count(alspac_long, family_partner_parenting_score)
+qplot(alspac_long$family_partner_parenting_score)
+
+count(alspac_long, family_mother_parenting_score)
+qplot(alspac_long$family_mother_parenting_score)
+
+count(alspac_long, family_female_parenting_score)
+qplot(alspac_long$family_female_parenting_score)
+
+count(alspac_long, family_male_parenting_score)
+qplot(alspac_long$family_male_parenting_score)
+
+# categorical
+# family_how_close_yp_feels_to_their_siblings
+# family_frequency_child_visits_relatives_age
+# family_child_sees_grandparents
+# family_child_gets_on_well_with_rest_of_family
+# family_child_sees_his_or_her_grandparents
+
+# make factors
 alspac_long <- alspac_long %>% 
-  mutate(bereavement_death_in_family_since_fct = 
-           factor(bereavement_death_in_family_since,
-                  labels = c("No", "Yes")))
+  mutate_at(vars(family_how_close_yp_feels_to_their_siblings,
+                 family_frequency_child_visits_relatives,
+                 family_child_sees_grandparents,
+                 family_child_gets_on_well_with_rest_of_family,
+                 family_child_sees_his_or_her_grandparents),
+            list("fct" = ~factorise(.)))
 
-count(alspac_long, bereavement_death_in_family_since,
-      bereavement_death_in_family_since_fct)
+
+count(alspac_long, family_how_close_yp_feels_to_their_siblings,
+      family_how_close_yp_feels_to_their_siblings_fct)
+
+count(alspac_long, family_frequency_child_visits_relatives,
+      family_frequency_child_visits_relatives_fct)
+
+count(alspac_long, family_child_sees_grandparents,
+      family_child_sees_grandparents_fct)
+
+count(alspac_long, family_child_gets_on_well_with_rest_of_family,
+      family_child_gets_on_well_with_rest_of_family_fct)
+
+count(alspac_long, family_child_sees_his_or_her_grandparents,
+      family_child_sees_his_or_her_grandparents_fct)
 
 # life ----
 
-count(alspac_long, life_score)
-qplot(alspac_long$life_score)
+count(alspac_long, life_score_since)
+qplot(alspac_long$life_score_since)
+
+
+
+
+
+
+# childcare ------------------------------
+
+
+alspac_long <- alspac_long %>%
+  mutate_at(
+    vars(
+      childcare_grandparent_looks_after_ch,
+      childcare_other_rel_looks_after_ch,
+      childcare_friend_or_neighbour_looks_after_ch,
+      childcare_gdprt_looks_after_ch,
+      childcare_frd_or_neighbour_looks_after_ch
+    ),
+    list("fct" = ~ factor(., labels = c("No", "Yes")))
+  ) %>%
+  mutate(
+    childcare_frequency_child_sees_grandparents_fct =
+      factorise(childcare_frequency_child_sees_grandparents),
+    childcare_frequency_child_visits_relatives_fct =
+      factorise(childcare_frequency_child_visits_relatives)
+  )
+
+count(alspac_long, childcare_grandparent_looks_after_ch,
+      childcare_grandparent_looks_after_ch_fct)
+count(alspac_long, childcare_other_rel_looks_after_ch,
+      childcare_other_rel_looks_after_ch_fct)
+count(alspac_long, childcare_friend_or_neighbour_looks_after_ch,
+      childcare_friend_or_neighbour_looks_after_ch_fct)
+count(alspac_long, childcare_gdprt_looks_after_ch,
+      childcare_gdprt_looks_after_ch_fct)
+count(alspac_long, childcare_frd_or_neighbour_looks_after_ch,
+      childcare_frd_or_neighbour_looks_after_ch_fct)
+
+count(alspac_long, childcare_frequency_child_sees_grandparents)
+count(alspac_long, childcare_frequency_child_visits_relatives)
+
+
+# relationship -----------------
+
+# relationship_to_parents_how_close_to_parents
+# relationship_to_parents_mum_really_loves_toddler
+# relationship_to_parents_partner_really_loves_child
+# relationship_to_parents_partner_positive_relationship_score
+# relationship_to_parents_partner_negative_relationship_score
+# relationship_to_parents_mum_really_loves_ch
+# relationship_to_parents_partner_really_loves_ch
+# relationship_to_parents_partner_interaction_score
+# relationship_to_parents_mother_interaction_score
+# relationship_to_parents_mother_really_loves_child
+# relationship_to_parents_mother_close_to_child
+# relationship_to_parents_partner_close_to_child
+# relationship_to_parents_partner_very_close_to_study_child
+# relationship_to_parents_partner_very_close_child
+# relationship_to_parents_mothers_partner_close_to_study_child
+# relationship_to_parents_mother_loves_study_child
+# relationship_to_parents_partner_loves_study_child
+
+
+# make factors
+alspac_long <- alspac_long %>% 
+  mutate_at(vars(relationship_to_parents_how_close_to_parents,
+                 relationship_to_parents_partner_really_loves_ch,
+                 relationship_to_parents_partner_loves_study_child,
+                 relationship_to_parents_mum_really_loves_toddler,
+                 relationship_to_parents_partner_really_loves_child,
+                 relationship_to_parents_mum_really_loves_ch,
+                 relationship_to_parents_mother_really_loves_child,
+                 relationship_to_parents_mother_close_to_child,
+                 relationship_to_parents_partner_close_to_child,
+                 relationship_to_parents_partner_very_close_to_study_child,
+                 relationship_to_parents_partner_very_close_child,
+                 relationship_to_parents_mothers_partner_close_to_study_child,
+                 relationship_to_parents_mother_loves_study_child),
+            list("fct" = ~factorise(.))) %>% 
+  mutate(relationship_to_parents_how_close_to_parents_fct = 
+           fct_recode(relationship_to_parents_how_close_to_parents_fct, 
+                      NULL = "No parents"),
+         relationship_to_parents_partner_really_loves_ch_fct = 
+           fct_recode(relationship_to_parents_partner_really_loves_ch_fct, 
+                      NULL = "No Partner"),
+         relationship_to_parents_partner_loves_study_child_fct = 
+           fct_recode(relationship_to_parents_partner_loves_study_child_fct, 
+                      NULL = "No partner"))
+
+
+count(alspac_long, relationship_to_parents_how_close_to_parents,
+      relationship_to_parents_how_close_to_parents_fct)
+count(alspac_long, relationship_to_parents_partner_really_loves_ch,
+      relationship_to_parents_partner_really_loves_ch_fct)
+count(alspac_long, relationship_to_parents_partner_loves_study_child,
+      relationship_to_parents_partner_loves_study_child_fct)
+
+
+count(alspac_long, relationship_to_parents_mum_really_loves_toddler,
+      relationship_to_parents_mum_really_loves_toddler_fct)
+count(alspac_long, relationship_to_parents_partner_really_loves_child,
+      relationship_to_parents_partner_really_loves_child_fct)
+count(alspac_long, relationship_to_parents_mum_really_loves_ch,
+      relationship_to_parents_mum_really_loves_ch_fct)
+count(alspac_long, relationship_to_parents_mother_really_loves_child,
+      relationship_to_parents_mother_really_loves_child_fct)
+count(alspac_long, relationship_to_parents_mother_close_to_child,
+      relationship_to_parents_mother_close_to_child_fct)
+count(alspac_long, relationship_to_parents_partner_close_to_child,
+      relationship_to_parents_partner_close_to_child_fct)
+count(alspac_long, relationship_to_parents_partner_very_close_to_study_child,
+      relationship_to_parents_partner_very_close_to_study_child_fct)
+count(alspac_long, relationship_to_parents_partner_very_close_child,
+      relationship_to_parents_partner_very_close_child_fct)
+count(alspac_long, relationship_to_parents_mothers_partner_close_to_study_child,
+      relationship_to_parents_mothers_partner_close_to_study_child_fct)
+count(alspac_long, relationship_to_parents_mother_loves_study_child,
+      relationship_to_parents_mother_loves_study_child_fct)
+
+
+
+
+count(alspac_long, relationship_to_parents_partner_positive_relationship_score)
+qplot(alspac_long$relationship_to_parents_partner_positive_relationship_score)
+
+count(alspac_long, relationship_to_parents_partner_negative_relationship_score)
+qplot(alspac_long$relationship_to_parents_partner_negative_relationship_score)
+
+
+count(alspac_long, relationship_to_parents_partner_interaction_score)
+qplot(alspac_long$relationship_to_parents_partner_interaction_score)
+
+count(alspac_long, relationship_to_parents_mother_interaction_score)
+qplot(alspac_long$relationship_to_parents_mother_interaction_score)
+
+
+
+# social -------
+
+# exclude problematic variables
+alspac_long <- select(alspac_long,
+                      -social_conflict_child_afraid_of_other_relative,
+                      -social_conflict_child_afraid_of_father,
+                      -social_conflict_child_afraid_of_mother,
+                      -social_conflict_child_afraid_of_other_children)
+
+social_vars <- alspac_long %>% 
+  select(starts_with("social_"), 
+         -starts_with("social_cohesion"),
+         -starts_with("social_discord")) %>% 
+  names()
+
+# make factors
+alspac_long <- alspac_long %>% 
+  mutate_at(vars(social_vars),
+            list("fct" = ~ factorise(.)))
+
+count(alspac_long, social_interaction_times_child_taken_to_friends_family,
+      social_interaction_times_child_taken_to_friends_family_fct)
+count(alspac_long, social_interaction_frequency_child_visits_family_friends,
+      social_interaction_frequency_child_visits_family_friends_fct)
+count(alspac_long, social_conflict_child_quarrels_with_older_children,
+      social_conflict_child_quarrels_with_older_children_fct)
+count(alspac_long, social_conflict_child_quarrels_with_twin,
+      social_conflict_child_quarrels_with_twin_fct)
+count(alspac_long, social_interaction_child_affectionate_to_younger_sibs,
+      social_interaction_child_affectionate_to_younger_sibs_fct)
+count(alspac_long, 
+      social_interaction_frequency_child_plays_with_children_not_sibs,
+      social_interaction_frequency_child_plays_with_children_not_sibs_fct)
+count(alspac_long, social_interaction_frequency_child_visits_friends_family,
+      social_interaction_frequency_child_visits_friends_family_fct)
+count(alspac_long, social_interaction_frequency_child_plays_w_other_children,
+      social_interaction_frequency_child_plays_w_other_children_fct)
+count(alspac_long, social_interaction_child_plays_with_children_not_sibs,
+      social_interaction_child_plays_with_children_not_sibs_fct)
+count(alspac_long, social_support_frequency_feeling_close_to_people,
+      social_support_frequency_feeling_close_to_people_fct)
+count(alspac_long, social_support_frequency_feeling_loved,
+      social_support_frequency_feeling_loved_fct)
+count(alspac_long, social_conflict_mealtime_arguments_between_kids,
+      social_conflict_mealtime_arguments_between_kids_fct)
+count(alspac_long, social_conflict_mealtime_arguments_between_kids_and_adults,
+      social_conflict_mealtime_arguments_between_kids_and_adults_fct)
+count(alspac_long, social_conflict_mealtime_arguments_between_adults,
+      social_conflict_mealtime_arguments_between_adults_fct)
+count(alspac_long, social_interaction_frequency_child_visits_friends,
+      social_interaction_frequency_child_visits_friends_fct)
+count(alspac_long, social_interaction_frq_child_plays_w_children_outside_school,
+      social_interaction_frq_child_plays_w_children_outside_school_fct)
+count(alspac_long, social_network_child_has_one_good_friend_past,
+      social_network_child_has_one_good_friend_past_fct)
+
+# 
+# count(alspac_long, social_conflict_child_afraid_of_other_relative)
+# count(alspac_long, social_conflict_child_afraid_of_father)
+# count(alspac_long, social_conflict_child_afraid_of_mother)
+# count(alspac_long, social_conflict_child_afraid_of_other_children)
+# 
+
+
+# siblings ------
+
+# sibling_interaction_child_argues_with_siblings
+# sibling_interaction_sibling_interaction_score
+# sibling_interaction_child_argues_with_older_child
+
+
+alspac_long <- alspac_long %>% 
+  mutate(sibling_interaction_child_argues_with_siblings_fct = 
+           factorise(sibling_interaction_child_argues_with_siblings),
+         sibling_interaction_child_argues_with_older_child_fct = 
+           factorise(sibling_interaction_child_argues_with_older_child))
+
+count(alspac_long, sibling_interaction_child_argues_with_siblings,
+      sibling_interaction_child_argues_with_siblings_fct)
+count(alspac_long, sibling_interaction_child_argues_with_older_child,
+      sibling_interaction_child_argues_with_older_child_fct)
+
+count(alspac_long, sibling_interaction_sibling_interaction_score)
+qplot(alspac_long$sibling_interaction_sibling_interaction_score) +
+  theme_bw()
+
+
+
+# Control variables clean ----------------------------------
+
+control_data <- read_rds("./data/clean/alspac_control_variables.rds")
+glimpse(contol_data)
+ 
+
+codebook <- map_df(control_data, function(x) attributes(x)$label) %>% 
+  gather(key = name, value = label)
+   
+View(codebook)
+
+
+
+
+# sex - kz021
+
+control_data <- control_data %>% 
+  mutate(female = case_when(kz021 == 1 ~ 0,
+                            kz021 == 2 ~ 1),
+         sex_fct = factor(female, labels = c("Male", "Female")))
+
+count(control_data, kz021, female, sex_fct)
+
+# ethnicity - c804, YPH2010, YPH2010, YPH2012
+
+control_data <- control_data %>% 
+  mutate(white = case_when(c804 == 1 ~ 1,
+                           c804 == 2 ~ 0),
+         white = case_when(is.na(white) & YPH2012 == 1 ~ 1,
+                           is.na(white) & YPH2012 == 2 ~ 0,
+                           TRUE ~ white))
+
+count(control_data, white, c804, YPH2012)
+
+
+# education needs - sa030, se030
+
+control_data <- control_data %>% 
+  mutate(special_edu_needs = case_when(sa030 == 1 ~ 1,
+                                       sa030 == 2 ~ 0),
+         special_edu_needs = 
+           case_when(is.na(special_edu_needs) & se030 == 1 ~ 1,
+                     is.na(special_edu_needs) & se030 == 2 ~ 0,
+                     TRUE ~ special_edu_needs))
+
+count(control_data, special_edu_needs, sa030)
+count(control_data, special_edu_needs, se030)
+
+count(control_data, sa030, se030) %>% print(n = 30)
+
+
+# mom edu - c645
+
+count(control_data, c645)
+
+control_data <- control_data %>% 
+  mutate(mom_edu_fct = case_when(c645 %in% 1:3 ~ "Other",
+                                 c645 == 4 ~ "A level",
+                                 c645 == 5 ~ "Degree"),
+         mom_edu_fct = as.factor(mom_edu_fct),
+         mom_degree = ifelse(mom_edu_fct == "Degree", 1, 0))
+
+count(control_data, c645, mom_edu_fct, mom_degree)
+
+# mom-marital status - j370, n8040
+control_data <- control_data %>% 
+  mutate(mom_partner = case_when(j370 %in% 1:4 ~ 0,
+                                 j370 %in% 5:6 ~ 1),
+         mom_work = case_when(c710 == 1 ~ 1,
+                              c710 == 2 ~ 0))
+
+
+count(control_data, j370, mom_partner)
+
+
+# mom-employment - c710
+count(control_data, c710, mom_work)
+
+control_data_small <- select(control_data, 
+                             uniqid, white, special_edu_needs, mom_edu_fct, 
+                             mom_degree, mom_partner, mom_work)
+
+# merge control and long data ----------------
+
+
+alspac_long <- left_join(alspac_long, control_data_small, by = "uniqid")
 
 # Export data -----------------------------------
 

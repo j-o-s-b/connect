@@ -55,6 +55,7 @@ map(bully_var, function(x) fig_desc_long(.data[[x]]))
 
 # friends
 
+
 friends_var <- c("friends_plays_with_kids_fct",
                  "friends_freq_visits_fct",
                  "friends_happy_num_friends_fct",
@@ -63,7 +64,14 @@ friends_var <- c("friends_plays_with_kids_fct",
                  "friends_talk_problems_fct",
                  "friends_freq_see_outside_school_fct",
                  "friends_whether_any_close_friend",
-                 "friends_num_close_friend_fct")
+                 "friends_num_close_friend_fct",
+                 "friends_yps_friends_fall_out_with_them_fct",
+                 "friends_friends_support_yp_when_they_need_them_fct",
+                 "friends_friends_put_yp_down_in_front_of_others_fct",
+                 "friends_friends_make_yp_feel_confident_fct",
+                 "friends_ch_one_good_friend_past_fct",
+                 "friends_child_has_one_good_friend_last_six_months_fct",
+                 "friends_yp_has_a_best_friend_fct")
 map(friends_var, function(x) tab_desc_tab(.data[[x]]))
 
 map(friends_var, function(x) fig_desc_long(.data[[x]]))
@@ -108,7 +116,6 @@ school_vars <- c("school_talk_friends_fct", "school_likes_teacher_fct",
                  "school_frightened_by_schoolmates_fct", 
                  "school_feel_popular_fct", 
                  "school_get_on_with_classmates_fct", 
-                 "school_teacher_fair_fct", 
                  "school_schoolmates_accept_them_fct", 
                  "school_feel_lonely_fct", "school_people_trust_them_fct", 
                  "school_people_depend_on_them_fct")
@@ -123,7 +130,8 @@ map(school_vars, function(x) fig_desc_long(.data[[x]]))
 alspac_long %>%
   select(age, parent_networks_mother_social_support_score, 
          parent_networks_mother_social_networks_score,
-         parent_networks_partner_social_networks_score) %>% 
+         parent_networks_partner_social_networks_score,
+         parent_networks_partner_social_support_score) %>% 
   rename_all(~str_replace_all(., "_", ".")) %>% 
   group_by(age) %>% 
   summarise_all(list(mean = ~mean(., na.rm = T),
@@ -146,12 +154,13 @@ qplot(alspac_long$parent_networks_mother_social_networks_score) +
   theme_bw()
 qplot(alspac_long$parent_networks_partner_social_networks_score) +
   theme_bw()
-
+qplot(alspac_long$parent_networks_partner_social_support_score) +
+  theme_bw()
 
 fig_cont_long(parent_networks_mother_social_support_score)
 fig_cont_long(parent_networks_mother_social_networks_score)
 fig_cont_long(parent_networks_partner_social_networks_score)
-
+fig_cont_long(parent_networks_partner_social_support_score)
 
 # peer problem + social cohesion -----
 
@@ -181,10 +190,6 @@ fig_cont_long(peer_problem_score)
 fig_cont_long(social_cohesion)
 
 
-# loneliness ---
-tab_desc_tab(loneliness_frequency_fct)
-fig_desc_long(loneliness_frequency_fct)
-
 
 
 
@@ -209,22 +214,6 @@ map(religion_var, function(x) fig_desc_long(.data[[x]]))
 
 # neighbour -------------------
 
-neighbour_var <- c("neighbour_mother_neighourhood_opinion_fct",
-                 "neighbour_burglary_worries_dad_fct",
-                 "neighbour_mugging_worries_dad_fct",
-                 "neighbour_sex_assault_pestering_worries_dad_fct",
-                 "neighbour_vandalism_worries_dad_fct",
-                 "neighbour_dad_lively_neighbourhood_fct",
-                 "neighbour_dad_friendly_neighbourhood_fct",
-                 "neighbour_dad_noisy_neighbourhood_fct",
-                 "neighbour_dad_clean_neighbourhood_fct",
-                 "neighbour_dad_attractive_neighbourhood_fct",
-                 "neighbour_dad_polluted_neighbourhood_fct")
-
-map(religion_var, function(x) tab_desc_tab(.data[[x]]))
-map(religion_var, function(x) fig_desc_long(.data[[x]]))
-
-
  
 qplot(alspac_long$neighbour_stress_score) +
   theme_bw()
@@ -233,8 +222,15 @@ fig_cont_long(neighbour_stress_score)
 
 # family ----------
 
+family_cat_var <- c("family_how_close_yp_feels_to_their_siblings",
+                    "family_frequency_child_visits_relatives",
+                    "family_child_sees_grandparents",
+                    "family_child_gets_on_well_with_rest_of_family",
+                    "family_child_sees_his_or_her_grandparents")
+
 alspac_long %>%
-  select(age, starts_with("family")) %>% 
+  select(age, starts_with("family")) %>%
+  select(-family_cat_var, -ends_with("fct")) %>% 
   rename_all(~str_replace_all(., "_", ".")) %>% 
   group_by(age) %>% 
   summarise_all(list(mean = ~mean(., na.rm = T),
@@ -252,18 +248,106 @@ alspac_long %>%
 
 
 
-# bereavement ------
+count(alspac_long, family_how_close_yp_feels_to_their_siblings,
+      family_how_close_yp_feels_to_their_siblings_fct)
+
+count(alspac_long, family_frequency_child_visits_relatives,
+      family_frequency_child_visits_relatives_fct)
+
+count(alspac_long, family_child_sees_grandparents,
+      family_child_sees_grandparents_fct)
+
+count(alspac_long, family_child_gets_on_well_with_rest_of_family,
+      family_child_gets_on_well_with_rest_of_family_fct)
+
+count(alspac_long, family_child_sees_his_or_her_grandparents,
+      family_child_sees_his_or_her_grandparents_fct)
 
 
-tab_desc_tab(bereavement_death_in_family_since_fct)
-fig_desc_long(bereavement_death_in_family_since_fct)
 
 
 # life ----
 
-qplot(alspac_long$life_score) +
+qplot(alspac_long$life_score_since) +
   theme_bw()
-fig_cont_long(life_score)
+fig_cont_long(life_score_since)
+
+
+# childcare -----
+
+childcare_var <- alspac_long %>% 
+  select(starts_with("childcare")) %>% 
+  select(ends_with("fct")) %>% 
+  names()
+
+test <- map(childcare_var, function(x) tab_desc_tab(.data[[x]]))
+for (i in seq_along(test)) print(test[[i]])
+map(childcare_var, function(x) fig_desc_long(.data[[x]]))
+
+
+# relationship --------------
+relationship_var <- alspac_long %>% 
+  select(starts_with("childcare")) %>% 
+  select(ends_with("fct")) %>% 
+  names()
+
+test <- map(relationship_var, function(x) tab_desc_tab(.data[[x]]))
+for (i in seq_along(test)) print(test[[i]])
+map(relationship_var, function(x) fig_desc_long(.data[[x]]))
+
+
+
+# cont vars
+alspac_long %>%
+  select(age, relationship_to_parents_partner_positive_relationship_score, 
+         relationship_to_parents_partner_negative_relationship_score,
+         relationship_to_parents_partner_interaction_score,
+         relationship_to_parents_mother_interaction_score) %>% 
+  rename_all(~str_replace_all(., "_", ".")) %>% 
+  group_by(age) %>% 
+  summarise_all(list(mean = ~mean(., na.rm = T),
+                     sd = ~sd(., na.rm = T),
+                     miss = ~mean(is.na(.)) * 100)) %>% 
+  na.omit() %>% 
+  pivot_longer(!age,
+               names_sep = "_",
+               names_to = c("Variable", ".value")) %>%
+  mutate(Variable = str_replace_all(Variable, "\\.", "_")) %>% 
+  arrange(Variable, age) %>% 
+  select(Variable, age, everything()) %>% 
+  rename_all(~str_to_title(.)) %>% 
+  knitr::kable(digits = 1)
+
+qplot(alspac_long$relationship_to_parents_partner_positive_relationship_score) +
+  theme_bw()
+qplot(alspac_long$relationship_to_parents_partner_negative_relationship_score) +
+  theme_bw()
+qplot(alspac_long$relationship_to_parents_partner_interaction_score) +
+  theme_bw()
+qplot(alspac_long$relationship_to_parents_mother_interaction_score) +
+  theme_bw()
+
+# social -----------
+social_var <- alspac_long %>% 
+  select(starts_with("social")) %>% 
+  select(ends_with("fct")) %>% 
+  names()
+
+test <- map(social_var, function(x) tab_desc_tab(.data[[x]]))
+for (i in seq_along(test)) print(test[[i]])
+map(social_var, function(x) fig_desc_long(.data[[x]]))
+
+
+# siblings --------
+
+count(alspac_long, sibling_interaction_child_argues_with_siblings,
+      sibling_interaction_child_argues_with_siblings_fct)
+count(alspac_long, sibling_interaction_child_argues_with_older_child,
+      sibling_interaction_child_argues_with_older_child_fct)
+
+count(alspac_long, sibling_interaction_sibling_interaction_score)
+qplot(alspac_long$sibling_interaction_sibling_interaction_score) +
+  theme_bw()
 
 
 # Bivariate statistics ----------------------------
