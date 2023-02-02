@@ -7,7 +7,7 @@ Connect is a collaboration between the National Centre for Social Research, the 
 
 You can read more at https://connectdata.org.uk
 
-There is a live demo at https://app.connectdata.org.uk
+We are working on a live demo which will be available at https://app.connectdata.org.uk
 
 ## Workflow
 
