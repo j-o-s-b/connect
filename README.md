@@ -11,11 +11,11 @@ There is a live demo at https://app.connectdata.org.uk
 
 ## Workflow
 
-The data was accessed from ...
+The data was accessed from the Avon Longitudinal Study of Parents and Children (ALSPAC)
 
-1. The data was converted from Stata format to R using xxx script
+1. The data was converted from Stata format to R 
 
-2. An initial set of variables were selected and renamed in xxx script
+2. An initial set of variables were selected and renamed 
 
 3. A secondary data cleaning was done using "scripts/02_data_clean.R". This produced the "alspac_long_v01.rds" which was used in subsequent scripts.
 
