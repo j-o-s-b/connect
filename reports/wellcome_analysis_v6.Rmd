@@ -1,0 +1,102 @@
+---
+title: "Wellcome Trust Project - Exploratory Data Report"
+subtitle: "Version 06"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    collapsed: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+# library(readr)
+library(knitr)
+
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+
+path <- "\\\\homerfp01/FolderRedirection/AlexC/Documents/work/connect"
+
+
+m10_coef2 <- read.csv(paste0(path, "/output/tabs/smfq_m10_stan.csv"))
+
+```
+
+
+## Variables used
+
+**Control variables**
+
+-	Sex
+-	Mother education 
+-	Health status at age 8
+-	Mother depression
+-	Adverse life events (age 1, 2 and 3)  
+-	Adverse life events (age 4, 5, 8) 
+-	SDQ (age 7, removing peer problems score) 
+
+ 
+**Variables at age 0-3**
+
+-	Maternal bond (age 0)
+-	Maternal bond (age 3)
+-	Social cohesion (average of age 0 and 3)
+-	Social discord (average age 0 and 3) 
+
+**Variables at age 4-7**
+
+-	Social cohesion (average age 5 and 7)
+-	Social discord (average age 5 and 7)
+
+**Variables at age 8-11**
+
+-	Bullied (age 8)
+-	Bullied (age 10)
+-	Friends score (average age 8 and 10) 
+-	Peer problems (average age 7 and 10 
+-	School feels lonely never (age 11)
+-	Social cohesion (age 10)
+-	Social discord (age 10)
+
+**Variables at age 12-15**
+
+-	Friends score (average age 12 and 13) 
+-	Peer problems (average age 12 and 13) 
+-	School feels lonely never (age 14)
+
+
+## SMFQ growth model
+
+These are the results from the model using the variables listed above using Bayesian estimation. The first column includes odds ratios while the other two refer to the credibility interval. While there is no significance test we can check if the credibility interval includes 1 as a proxy for "significance".
+
+Please note that the model has significantly lower sample size the previous models: 3,274 individuals and 20,542 rows.
+
+```{r}
+knitr::kable(m10_coef2, digits = 2) 
+
+
+
+```
+
+Some takeaways from the model:
+
+- if mother has a degree decreases the chances by around 34% of depression
+- if they are very health at age 8 it decreases the chances by 15%
+- if mother has depression it increases chances by around 50%
+- if they had adverse life events up to age 3 it increases chances by ~22%
+- SDQ total difficulties at age 7 increases chances by around 4%
+- increase by 1 in average social discord score before 4 increases chances by 32%
+- being bullied at age 8 increases chances of depression by 58% 
+- being bullied at age 10 increases chances of depression by ~3 times though the effect decreases with time (by 6% with each extra year)
+- never feeling lonely at school at age 11 decreases chances by ~49%
+- an increase by 1 in friends average scores at ages 12-13 increase chance of depression by 8%
+- an increase by 1 in peer problem score at ages 12-13 leads to a increase in probably of depression by ~13%
+
+- the rest of the predictors include 1 in the credibility interval so there is no evidence they have an effect on the likelihood of depression
+ 
+The graph with the effects and credibility intervals.
+
+```{r}
+knitr::include_graphics("./output/fig/smfq_m10_stan.png")
+```
+
