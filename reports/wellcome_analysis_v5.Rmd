@@ -33,7 +33,7 @@ library(broom.mixed)
 path <- "\\\\homerfp01/FolderRedirection/AlexC/Documents/work/connect"
 
 # load data
-alspac_long_full <- read_rds(str_c(path, "/data/clean/alspac_long_v01.rds"))
+alspac_long_full <- read_rds(str_c(path, "/data/clean/alspac_long_v02.rds"))
 
 # select cases that participated at age 7
 alspac_long <- alspac_long_full %>% 
@@ -47,11 +47,18 @@ list.files(str_c(path, "/scripts/functions/"), full.names = T) %>%
 
 
 # load models
-load(str_c(path, "/data/clean/r_img.RData"))
 model_paths <- list.files(str_c(path, "/output/models"), full.names = T) 
 
+# get only models of interes
+model_paths_non_stan <- model_paths %>% 
+  str_subset("stan", negate = T)
 
-for(i in model_paths)  load(i)
+
+model_paths_stan_interest <- model_paths %>% 
+  str_subset("smfq_8_stan.RData|smfq_9_stan")
+
+
+for(i in c(model_paths_non_stan, model_paths_stan_interest))  load(i)
 
 
 ```
@@ -132,7 +139,7 @@ fig <- m8_coef2 %>%
   geom_vline(xintercept = 1) +
   labs(x = "Odds", y = "Predictors")
 
-ggsave(plot = fig, "m8_stan.png", dpi = 500)
+ggsave(plot = fig, "./output/fig/m8_stan.png", dpi = 500)
 
 fig
 
