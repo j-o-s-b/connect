@@ -1,0 +1,14 @@
+name: wellcome_connect
+title: wellcome_connect
+username:
+account: connect-wellcome-app-v1
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 8167988
+bundleId: 6790298
+url: https://connect-wellcome-app-v1.shinyapps.io/wellcome_connect/
+when: 1675099794.37599
+lastSyncTime: 1675099794.37599
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: app_v2.R|m_smfq_8_stan_nodata.RData

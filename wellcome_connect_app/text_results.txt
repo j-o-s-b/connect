@@ -1,0 +1,17 @@
+<h3> Key findings</h3> 
+
+<ul>
+<li> Age: an initial increase in probability and then a decrease (see also graph)</li>
+<li> Female: females are more than twice likely to suffer from depression</li>
+<li> Mother’s education: if mother has a degree the likelihood of being depressed decrease by approximately 30%</li>
+<li> bullied_8: bullied at age 8 increases chances of depression by 50%</li>
+<li> bullied_10: bullied at age 10 increases chances of depression by more than 3 times, although this effect decreases in time</li>
+<li> school_likes_teacher_always: they like teacher at ages 4, 5, 6 and 8, time constant decreases chances of depression by ~15%</li>
+<li> school_get_on_with_classmates_always: say they always get on with colleagues at ages 11 and 16 decreases chances of depression by ~30%</li>
+<li> school_feel_lonely_never: they say they never feel lonely at school at ages 11 and 14 decreases chances of depression by ~45%</li>
+<li> friends_score_avg: average friend score at ages 8, 10, 12, 13 and 17, an increase in 1 point leads to an approximate increase of 20% in chances of depression</li>
+<li> peer_problem_score_avg: peer problem score at ages 7, 8, 10, 12, 13 and 16, , an increase in 1 point leads to an approximate increase of 35% in chances of depression </li>
+<li> romantic_13 and romantic_17: lead to a initial increase in likelihood of depression but the effects decreases in time </li>
+<li> parent_networks_mother_social_support_score_avg: mother networks social support average score over ages -1, 0, 1, 2, 5, 6, 9, 12, , an increase in 1 point leads to an approximate decrease of 2% in chances of depression</li>
+<li> social_cohesion_avg: social cohesion score averaged over ages 0, 1, 2, 3, 5, 7, 10, 18, an increase in 1 point leads to an approximate increase of 4% in chances of depression </li>
+</ul>
