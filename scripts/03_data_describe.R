@@ -1,19 +1,24 @@
 
 # Admin -------------------------------------------------
 
-
+# load package
 library(tidyverse)
 
 # load data
-alspac_long <- read_rds("./data/clean/alspac_long_v01.rds")
+alspac_long_full <- read_rds("./data/clean/alspac_long_v02.rds")
 
 # load functions
 list.files("./scripts/functions/", full.names = T) %>% 
   map(source)
 
+
+# select cases that participated at age 7
+alspac_long <- alspac_long_full %>% 
+  filter(baseline_age_7y9m == 1) 
+
 # Univariate statistics ----------------------------
 
-# Outcomes -------------------------------------
+## Outcomes -------------------------------------
 
 dep_change <- alspac_long %>% 
   select(age, anxiety, depression, depression_smfq) %>% 
@@ -42,8 +47,9 @@ dep_change %>%
 
 ggsave("./output/fig/dep_trends.png", dpi = 300)
 
-# Key predictors
-# bullying
+## Key predictors ---------------
+
+### Bullying --------------
 
 bully_var <- c("bullying_victim_fct", 
                "bullying_often_bullied_fct",
@@ -53,9 +59,9 @@ map(bully_var, function(x) tab_desc_tab(.data[[x]]))
 map(bully_var, function(x) fig_desc_long(.data[[x]]))
 
 
-# friends
+### Friends -----------------
 
-
+# categorical variables
 friends_var <- c("friends_plays_with_kids_fct",
                  "friends_freq_visits_fct",
                  "friends_happy_num_friends_fct",
@@ -79,7 +85,7 @@ map(friends_var, function(x) fig_desc_long(.data[[x]]))
 
 
 
-# cont vars
+# continuous variables
 alspac_long %>%
   select(age, friends_score, friends_score_log) %>% 
   rename_all(~str_replace_all(., "_", ".")) %>% 
@@ -104,7 +110,7 @@ fig_cont_long(friends_score)
 
 
 
-# school
+### School -----------
 
 
 school_vars <- c("school_talk_friends_fct", "school_likes_teacher_fct",
@@ -126,7 +132,8 @@ map(school_vars, function(x) fig_desc_long(.data[[x]]))
 
 
 
-# parents
+### Parents ----------------
+
 alspac_long %>%
   select(age, parent_networks_mother_social_support_score, 
          parent_networks_mother_social_networks_score,
@@ -162,7 +169,7 @@ fig_cont_long(parent_networks_mother_social_networks_score)
 fig_cont_long(parent_networks_partner_social_networks_score)
 fig_cont_long(parent_networks_partner_social_support_score)
 
-# peer problem + social cohesion -----
+### Peer problem + social cohesion -----
 
 # describe continuous vars
 alspac_long %>%
@@ -190,11 +197,8 @@ fig_cont_long(peer_problem_score)
 fig_cont_long(social_cohesion)
 
 
+### Romantic -----
 
-
-
-
-# romantic -----
 romantic_var <- c("romantic_in_relationship_or_out_with_someone_fct",
                   "romantic_in_relationship_fct",
                   "romantic_emotionally_close_fct")
@@ -202,7 +206,7 @@ romantic_var <- c("romantic_in_relationship_or_out_with_someone_fct",
 map(romantic_var, function(x) tab_desc_tab(.data[[x]]))
 map(romantic_var, function(x) fig_desc_long(.data[[x]]))
 
-# religion -----
+### Religion -----
 
 religion_var <- c("religion_support_mother_fct",
                   "religion_support_partner_fct")
@@ -212,7 +216,7 @@ map(religion_var, function(x) fig_desc_long(.data[[x]]))
 
 
 
-# neighbour -------------------
+### Neighbor -------------------
 
  
 qplot(alspac_long$neighbour_stress_score) +
@@ -220,7 +224,7 @@ qplot(alspac_long$neighbour_stress_score) +
 fig_cont_long(neighbour_stress_score)
 
 
-# family ----------
+### Family ----------
 
 family_cat_var <- c("family_how_close_yp_feels_to_their_siblings",
                     "family_frequency_child_visits_relatives",
@@ -266,14 +270,7 @@ count(alspac_long, family_child_sees_his_or_her_grandparents,
 
 
 
-# life ----
-
-qplot(alspac_long$life_score_since) +
-  theme_bw()
-fig_cont_long(life_score_since)
-
-
-# childcare -----
+### Childcare -----
 
 childcare_var <- alspac_long %>% 
   select(starts_with("childcare")) %>% 
@@ -285,7 +282,9 @@ for (i in seq_along(test)) print(test[[i]])
 map(childcare_var, function(x) fig_desc_long(.data[[x]]))
 
 
-# relationship --------------
+### Relationship --------------
+
+# categorical variables
 relationship_var <- alspac_long %>% 
   select(starts_with("childcare")) %>% 
   select(ends_with("fct")) %>% 
@@ -297,7 +296,7 @@ map(relationship_var, function(x) fig_desc_long(.data[[x]]))
 
 
 
-# cont vars
+# continuous variables
 alspac_long %>%
   select(age, relationship_to_parents_partner_positive_relationship_score, 
          relationship_to_parents_partner_negative_relationship_score,
@@ -327,7 +326,9 @@ qplot(alspac_long$relationship_to_parents_partner_interaction_score) +
 qplot(alspac_long$relationship_to_parents_mother_interaction_score) +
   theme_bw()
 
-# social -----------
+### Social -----------
+
+
 social_var <- alspac_long %>% 
   select(starts_with("social")) %>% 
   select(ends_with("fct")) %>% 
@@ -338,7 +339,7 @@ for (i in seq_along(test)) print(test[[i]])
 map(social_var, function(x) fig_desc_long(.data[[x]]))
 
 
-# siblings --------
+### Siblings --------
 
 count(alspac_long, sibling_interaction_child_argues_with_siblings,
       sibling_interaction_child_argues_with_siblings_fct)
@@ -353,7 +354,7 @@ qplot(alspac_long$sibling_interaction_sibling_interaction_score) +
 # Bivariate statistics ----------------------------
   
 
-# bullying
+## Bullying
 
 bully_var <- c("bullying_victim_fct", 
                "bullying_often_bullied_fct",
@@ -378,7 +379,6 @@ trends_bully_8 <- alspac_long2 %>%
   summarise(Anxiety_prop = mean(anxiety, na.rm = T),
             Depression_prop = mean(depression, na.rm = T),
             Depress_smfq_prop = mean(depression_smfq, na.rm = T)) %>% 
-  #  filter(!is.nan(Anxiety_prop)) %>% 
   rename(bully = bully_victim_8) %>% 
   mutate(bully_age = 8) %>% 
   ungroup()
@@ -389,7 +389,6 @@ trends_bully_10 <- alspac_long2 %>%
   summarise(Anxiety_prop = mean(anxiety, na.rm = T),
             Depression_prop = mean(depression, na.rm = T),
             Depress_smfq_prop = mean(depression_smfq, na.rm = T)) %>% 
-  #  filter(!is.nan(Anxiety_prop)) %>% 
   rename(bully = bully_victim_10) %>% 
   mutate(bully_age = 10) %>% 
   ungroup()
