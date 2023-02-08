@@ -1,0 +1,167 @@
+---
+title: "Wellcome Trust Project - Exploratory Data Report"
+subtitle: "Version 05"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    collapsed: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+
+def <- knitr::knit_hooks$get("output")
+knitr::knit_hooks$set(output = function(x, options) {
+  x <- def(x, options)
+  ifelse(!is.null(options$suppress), 
+         gsub(pattern = "```.*```|\\[.*\\]|<p>\\[.*\\]</p>", "", x), x)
+})
+
+
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
+
+
+
+library(tidyverse)
+library(knitr)
+library(lme4)
+library(broom)
+library(texreg)
+library(broom.mixed)
+
+path <- "\\\\homerfp01/FolderRedirection/AlexC/Documents/work/connect"
+
+# load data
+alspac_long_full <- read_rds(str_c(path, "/data/clean/alspac_long_v01.rds"))
+
+# select cases that participated at age 7
+alspac_long <- alspac_long_full %>% 
+  filter(baseline_age_7y9m == 1) 
+
+
+
+# load functions
+list.files(str_c(path, "/scripts/functions/"), full.names = T) %>% 
+  map(source)
+
+
+# load models
+load(str_c(path, "/data/clean/r_img.RData"))
+model_paths <- list.files(str_c(path, "/output/models"), full.names = T) 
+
+
+for(i in model_paths)  load(i)
+
+
+```
+
+
+## Variables used
+
+### Control variables
+- **female**: Participant assigned sex at birth (1 = female, 0 = male)
+- **white**: Child ethnic background
+- **mom_edu_fct**: mother's education at 32 wks gest, categorical
+- **mom_depression**: if mother has severe depression at age 8
+- **siblings** if they have siblings are age 7
+- **healthy_very_8**: very healthy at age 8
+
+### Key variables of interest
+
+- **bullied_8**: bullied at age 8, time constant (1 = Yes, 0 = No)
+- **bullied_10**: bullied at age 8, time constant (1 = Yes, 0 = No)
+- **school_likes_teacher_always**: they like teacher at ages 4, 5, 6 and 8, time constant (1 = Yes, 0 = No)
+- **school_get_on_with_classmates_always**: say they always get on with colleagues at ages 11 and 16, time constant (1 = Yes, 0 = No)
+- **school_feel_lonely_never**: they say they never feel lonely at school at ages 11 and 14, time constant (1 = Yes, 0 = No)
+- **friends_score_avg**: average friend score at ages 8, 10, 12, 13 and 17, time constant (continuous)
+- **peer_problem_score_avg**: peer problem score at ages 7, 8, 10, 12, 13 and 16, time constant (continuous)
+- **friends_plays_with_kids_rev_stab**: friends play with kids at age 1, time constant (0 = Never to 4 = Every day)
+- **romantic_13**: romantic in relationship or out with_someone at age 13, time varying (1 = Yes, 0 = No, ages below 13 fixed to 0)
+- **family_maternal_bond_1**: family maternal bond at age 1, time constant (continuous)
+- **family_mother_satisfaction_with_partner_avg**: mother satisfaction with partner averaged over ages 3, 6, 9, 12, time constant (continuous)
+- **parent_networks_mother_social_support_score_avg**: mother networks social support average score over ages -1, 0, 1, 2, 5, 6, 9, 12, time constant (continuous)
+- **childcare_grandparent_looks_after_ch_0**: grandparents offer childcare are age 0, time constant (1 = Yes, 0 = No)
+- **religion_support_mother_avg**: religion support mother averaged over ages -1, 5, 6, time constant (continuous between 0 and 1)
+- **social_cohesion_avg**: social cohesion score averaged over ages 0, 1, 2, 3, 5, 7, 10, 18, time constant (continuous)
+- **social_discord_avg**: social discord score averaged over ages 0, 1, 2, 3, 5, 7, 10, 18, time constant (continuous)
+- **change_school_9**: changed school at age 9
+- **change_school_17**: changed school at age 17
+- **move_home_before8**: if they moved home before 8
+
+## SMFQ growth model
+
+Based on a series of models run (see next section) and the amount of item missing this is the current growth model chosen for SMFQ. Sample size is still smaller than we would like but better than previous models. This table is based on maximum likelihood estimation which still has some estimation issues.
+
+```{r results='asis'}
+htmlreg(list(m_smfq_8, m_smfq_9), 
+        custom.model.names = c("Final model", "Model with grouped time predictors"))
+```
+
+
+These are the results from the "final model" using Bayesian estimation. There are more trust worthy. The first column includes odds ratios while the rest refer to logg-odds. For an idea of "significance" you can check if the confidence interval includes 0.
+
+```{r}
+m8_coef <- broom::tidy(m_smfq_8_stan, conf.int = TRUE)  
+
+
+m8_coef2 <- m8_coef %>% 
+  mutate(odds = exp(estimate),
+         odds_lci = exp(conf.low),
+         odds_uci = exp(conf.high)) %>%
+  rename(log_odds = estimate) %>% 
+  select(term, odds, log_odds, everything()) 
+
+
+
+m8_coef2 %>% 
+  kable(digits = 2)
+
+
+
+```
+
+We can also visualize the odds ratios. 
+
+```{r}
+fig <- m8_coef2 %>% 
+  mutate(term = factor(term, levels = m8_coef2$term) %>% fct_rev()) %>% 
+  ggplot(aes(odds, term, xmin = odds_lci, xmax = odds_uci)) +
+  geom_pointrange() +
+  theme_bw() +
+  geom_vline(xintercept = 1) +
+  labs(x = "Odds", y = "Predictors")
+
+ggsave(plot = fig, "m8_stan.png", dpi = 500)
+
+fig
+
+```
+
+
+
+### SMFQ exploratory models
+
+These are some of the models I ran to decide which variables to keep and how to treat change in time. Initially I run a couple of unconditional change models. I decided to include age and age square with a random intercept and slope for linear age. Model has convergence issues and needs to be re-run using Bayesian estimation so interpret with care.
+
+```{r results='asis'}
+htmlreg(list(gm0, gm1, gm2))
+```
+
+I then added a set of models with controls and groups of key variables. I tried to group these by topic as much as I could. The variables that were significant in some of these models and did not have large amounts of missing were also included in the final model above. The last model represents a full model with the main variables of interest but had a very small sample size. All models have convergence issues so coefficients should be interpreted with care.
+
+```{r results='asis'}
+htmlreg(list(m_smfq_2, m_smfq_3, m_smfq_4, m_smfq_5, m_smfq_6, m_smfq_7, m_smfq_full))
+```
+
+
+## Depression and anxiety growth models
+
+Using the final model from SMFQ as the starting point these are some similar models for depression and anxiety.
+
+```{r results='asis'}
+htmlreg(list(m_anxiety_8, m_depress_8), 
+        custom.model.names = c("Anxiety", "Depression"))
+```
+
+
