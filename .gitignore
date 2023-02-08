@@ -4,3 +4,7 @@
 .Rproj.user/
 *.rds
 .Rhistory
+output/models/
+mplus/
+*.RData
+*.csv
