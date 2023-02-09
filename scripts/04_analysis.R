@@ -603,6 +603,95 @@ save(m_smfq_8_stan, file = "./output/models/m_smfq_8_stan.RData")
 
 
 
+
+
+
+
+# best model with 500 iterations
+m_smfq_8_stan_500 <- 
+  stan_glmer(depression_smfq ~ 1 + age0 + I(age0^2) + 
+               female + white + mom_edu_fct + 
+               healthy_very_8 + mom_depression + siblings +
+               bullied_8 + bullied_10 + 
+               school_likes_teacher_always + 
+               school_get_on_with_classmates_always +
+               school_feel_lonely_never +
+               friends_score_avg + 
+               peer_problem_score_avg +
+               romantic_13 + 
+               romantic_17 + 
+               social_cohesion_avg + 
+               parent_networks_mother_social_support_score_avg +
+               childcare_grandparent_looks_after_ch_0 +
+               age0:school_feel_lonely_never +
+               age0:childcare_grandparent_looks_after_ch_0 +
+               age0:peer_problem_score_avg +
+               age0:romantic_13 +
+               age0:romantic_17 + 
+               age0:bullied_10 +
+               (1 + age0 | uniqid),
+             data = alspac_long, family = binomial(),
+             init_r = 0,
+             iter = 1000)
+
+summary(m_smfq_8_stan_500)
+tidy(m_smfq_8_stan_500, exp = TRUE)
+glance(m_smfq_8_stan_500)
+
+save(m_smfq_8_stan_500, file = "./output/models/m_smfq_8_stan_500.RData")
+
+
+
+
+
+# best model with 1000 iterations
+m_smfq_8_stan_1000 <- 
+  stan_glmer(depression_smfq ~ 1 + age0 + I(age0^2) + 
+               female + white + mom_edu_fct + 
+               healthy_very_8 + mom_depression + siblings +
+               bullied_8 + bullied_10 + 
+               school_likes_teacher_always + 
+               school_get_on_with_classmates_always +
+               school_feel_lonely_never +
+               friends_score_avg + 
+               peer_problem_score_avg +
+               romantic_13 + 
+               romantic_17 + 
+               social_cohesion_avg + 
+               parent_networks_mother_social_support_score_avg +
+               childcare_grandparent_looks_after_ch_0 +
+               age0:school_feel_lonely_never +
+               age0:childcare_grandparent_looks_after_ch_0 +
+               age0:peer_problem_score_avg +
+               age0:romantic_13 +
+               age0:romantic_17 + 
+               age0:bullied_10 +
+               (1 + age0 | uniqid),
+             data = alspac_long, family = binomial(),
+             init_r = 0,
+             iter = 1000)
+
+summary(m_smfq_8_stan_1000)
+tidy(m_smfq_8_stan_1000, exp = TRUE)
+glance(m_smfq_8_stan_1000)
+
+save(m_smfq_8_stan_1000, file = "./output/models/m_smfq_8_stan_1000.RData")
+
+load("./output/models/m_smfq_8_stan.RData")
+
+
+left_join(tidy(m_smfq_8_stan_1000), 
+          tidy(m_smfq_8_stan), by = "term") %>% 
+  mutate(dif = abs(estimate.x) - abs(estimate.y) %>% round(2)) %>% 
+  ggplot(aes(dif)) + geom_density()
+
+
+
+
+
+
+
+
 # run full model with all predictors for refrence
 # considerable loss of sample
 
