@@ -1,6 +1,5 @@
 
 # set up working directory, change as needed
-#setwd("//homerfp01/FolderRedirection/AlexC/Documents/work/connect/")
 
 
 # load what we need --------------------------
@@ -9,16 +8,13 @@
 # load packages
 library(shiny)
 library(tidyverse)
+library(shinydashboard)
 library(tidybayes)
 library(rstantools)
-library(plotly)
-library(shinydashboard)
 library(rstanarm)
 
-
-
 # load info needed
-load("m_smfq_8_stan_nodata.RData")
+load("m_smfq_8_stan_1000_nodata.RData")
 avg_pred_data <- read_csv("avg_pred_data_smfq.csv")
 m8_stan_sum_results <- read_csv("m8_stan_results.csv") %>% 
     select(term, odds, odds_lci, odds_uci)
@@ -60,7 +56,7 @@ ui <- dashboardPage(
                     
                     fluidRow(
                         box(
-                            plotlyOutput("fig", 
+                            plotOutput("fig", 
                                          height = 500,
                                          width = 700), 
                             width = 12
@@ -202,12 +198,7 @@ ui <- dashboardPage(
                     ),
                     fluidRow(box(actionButton("estimate", "Calculate trajectories",
                                               class="btn btn-success", width = "270"), 
-                                 width = 3),
-                             box(
-                                 title = "Warning", width = 3, background = "maroon",
-                                 "Takes ~ 2 minutes to estimate. ",
-                                 "New graph should appear on the right."
-                             ))
+                                 width = 3))
             )
         )))
 
@@ -215,23 +206,15 @@ ui <- dashboardPage(
 
 server <- function(input, output) {
     
-    output$fig <- renderPlotly({
-        fig_test <- m8_stan_sum_results %>% 
-            mutate(term = factor(term, levels = m8_stan_sum_results$term) %>%
-                       fct_rev()) %>% 
-            ggplot(aes(odds, term, xmin = odds_lci, xmax = odds_uci,
-                       text = paste("variable:", term, "\n",
-                                    "odds:", round(odds, 2), "\n",
-                                    "lci:", round(odds_lci, 2), "\n",
-                                    "uci:", round(odds_lci, 2)))) +
-            geom_pointrange() +
-            theme_bw() +
-            geom_vline(xintercept = 1) +
-            labs(x = "Odds", y = "Predictors")
-        
-        
-        ggplotly(fig_test, tooltip = "text")
-    })
+    output$fig <- renderImage({
+        list(
+            src = file.path("m8_res.png"),
+            contentType = "image/png",
+            width = 700,
+            height = 500
+        )
+    }, deleteFile = FALSE)
+    
     
     output$m8fit <- renderDataTable({
         mutate_if(m8_stan_sum_results, is.numeric, ~round(., 2))
@@ -384,7 +367,7 @@ server <- function(input, output) {
         left_join(scenario1_react(), age_df, "uniqid") %>% 
             mutate(age0 = age - 8) %>% 
             
-            epred_draws(object = m_smfq_8_stan, 
+            epred_draws(object = m_smfq_8_stan_1000, 
                         ndraws = 50,
                         allow_new_levels = TRUE,
                         re_formula = NA)
@@ -396,7 +379,7 @@ server <- function(input, output) {
             mutate(age0 = age - 8) %>% 
             
             epred_draws(
-                object = m_smfq_8_stan, 
+                object = m_smfq_8_stan_1000, 
                 ndraws = 50,
                 allow_new_levels = TRUE,
                 re_formula = NA)
