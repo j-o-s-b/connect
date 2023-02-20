@@ -1,0 +1,68 @@
+Connect Analysis plan
+
+Aims
+This project will investigate the relationship between the quality of social ties in childhood and the development of mental health problems in young people. It will do so by estimating the trajectory of mental health across adolescence and early adulthood and exploring how trajectories are estimated to differ between children and young people with different qualities of social ties across different relationship domains. 
+Furthermore, this work will also identify key ages when young people experienced the largest increase in mental health problems, and if these differ between young people who had experienced different qualities of social ties across different relationship domains. 
+
+Data
+Data collected in the Avon Longitudinal Study of Parents and Children (ALSPAC, also known as “Children of the 90s”) will be used for this analysis. This is a longitudinal study that recruited pregnant women in the South West of England (county of Avon, also known as Greater Bristol area) who were due to give birth between April 1991 and December 1992. 
+The first outcome of interest for this analysis will be potential depression, as measured through the Short Mood and Feelings Questionnaire (SMFQ). The SMFQ is a screening tool for depression in children and young people. The SMFQ has been administered to the participants at 9 time points (between the ages of 10 and 23 years old). Only the consistently collected data collected from the participants themselves in the questionnaire format (and not at an ALSPAC clinic) will be used in this analysis. From this, we have five measures of the consistent SMFQ from children and young people; at ages 16, 18, 21, 22 and 23 years old.
+As depression and anxiety are both commen and highly correlated, our second outcome of interest is the presence of  anxiety in young adults. Information was collected at age 7, 10, 13 and 15 using the Development and Well-Being Assessment Questionnaire (DAWBA) and at age 17 and 24 using the Clinical Interview Scheduled Revised (CIS-R). Data was collected from the children themselves from age 15 and before this it was parent reported. 
+Different domains of social ties will be included where data is available in the survey (please see appendix 1 for inclusion and exclusion criteria of social tie variables). Although ALSPAC asks children (and, where appropriate, their parents) about their connectedness to their family, friends, school environment and neighbourhood, these measures are not measured consistently across the course of the study. As these variables are mainly collected before child-reported SMFQ used as the outcome in this analysis, we propose they will be used as time-fixed variables measuring participant’s connectedness in different periods of their early life: infancy (incl. pre-natal exposure and between 0 and 4 years old), childhood (5 to 11 years old) and adolescence (12-16 years old). 
+Where possible, validated scales or established measures capturing social ties will be used in this analysis. These will focus on quality of social ties rather than the number of ties a child, or their parent, reports. These social connection variables may include the measures outlined in Table 1:
+
+Variables that may be correlated with social connection and mental health will also be included as covariates in this analysis to control for these factors in analysis. These are:
+
+•	Sex, Ethnicity, Parental mental health, Mother’s education, Parental socio-economic status, Parent’s employment, Parents marital status, Life events (including moving house, starting a new school, or getting a new sibling), Child’s educational level, Area level deprivation, Young person’s employment, Physical disability, Physical activity, SEN status, Puberty development
+
+We will conduct exploratory analyses to select the variables that can be included based on missingness and impact this will have on the analysed sample.
+
+Methods
+Growth curve modelling will be used to estimate trajectories in the mental health of young people over time.   This will first be used to estimate the overall trajectory for probable depression and onset of depression and anxiety (as measured by the SMFQ, DAWBA and CIS-R) between the ages of 16 and 23. 
+The analysis will be done in three stages
+1.	Linear, quadratic and nonparametric trajectories will be tested to ensure the trajectory that best fits the data is used to estimate the growth of probable depression over this time period. Model fit will be assessed using likelihood ratio tests and information criteria to establish the model that best fits the data.
+2.	We will model each outcome separately with predictors from each dimension of social connection and controls. From these models, we will estimate:
+a.	The overall trajectories for each sub-group of the population
+b.	The age at which depressive symptoms increase most rapidly within each sub-group of the population
+c.	The age at which young people in each sub-group of the population are most and least likely to experience depressive symptoms
+d.	Separate population-averaged trajectories will then be estimated for perceived quality of social connections in each of the relevant domains . 
+e.	For time varying predictors we will also investigate both concurrent and long term effects of social connections.
+3.	We will model each outcome separately with the best predictors from each dimension. This will enable us to investigate the relative importance of different social connections
+Output
+From this analysis, multiple types of output will be produced:
+•	A report of key findings, including visualisations of different trajectories where appropriate
+•	A methodological report outlining the methods used, inclusive of sensitivity analysis
+•	A Shiny Dashboard facilitating the comparison of mental health trajectories broken down by differentlevels of social connection
+•	Shareable syntax allowing replication of this approach in R. A step-by-step guide to support other researchers who want to conduct growth curve modelling in the domain of social ties and mental health
+
+Appendix A:
+Inclusion and exclusion criteria for social connection variables. 
+The social connection variable has to:
+1.	Measure perceived social connection experienced by the child, reported by the child, parent or caregiver. 
+a.	The following experiences are covered related to experienced social connection:
+i.      Bullying (perpetration or experience)
+ii.      Discrimination 
+iii.      Loneliness
+iv.      Safety (i.e. perceived sense of safety in a relationship or community)
+v.      Positive relationships
+vi.      Time spent with child by caregivers or family
+b.	These perceived connectedness experiences can be in the following settings
+i.      School
+ii.      Peer-relationships
+iii.      Family / caregiver relationships
+iv.      Community (incl. neighbourhood connection and religious group connection)
+2.	Variables that relate to substantial shifts in social networks will not included as predictor variables but as controls or ‘markers’:
+a.	House moves
+b.	School move / joining school / leaving school
+c.	Family divorce
+d.	New brother/sister
+e.	School exclusion
+f.	Death in family
+g.	Life events
+h.	+ if measured, the effect that this has had on the child / young person’s mental health
+We exclude variables related to 
+1.	introversion/extraversion of child
+2.	Childbirth of young person and/or partner 
+3.	Sample member employment
+4.	Household composition of sample member (i.e. number of people in household)
+5.	Number social ties a child has (except for friendships)
