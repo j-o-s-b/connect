@@ -13,7 +13,7 @@ We are working on a live demo which will be available at https://app.connectdata
 
 The data was accessed from the Avon Longitudinal Study of Parents and Children (ALSPAC)
 
-1. The data was converted from Stata format to R and variables were selected and partially cleaned (script xxxxxx in the scripts folder)
+1. The data was converted from Stata format to R and variables were selected and partially cleaned (scripts/0_Convert Stata to R.R; scripts/01_data management.R; scripts/01.1Data Management_Edits following lived experience workshop.R, scripts/01.2_Extract control variables.R)  in the scripts folder
 
 3. A secondary data cleaning was done using "scripts/02_data_clean.R". This produced the "alspac_long_v02.rds" which was used in subsequent scripts.
 
