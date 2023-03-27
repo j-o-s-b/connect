@@ -72,18 +72,18 @@ m10_coef2 %>%
   knitr::kable(digits = 2) 
 
 # Interpretation --------------
+# girls have almost 3 times higher chances of depression compared to boys
 
-# if mother has a degree decreases the chances by around 34% of depression
-# if they are very health at age 8 it decreases the chances by 15%
+# if mother has a degree decreases the chances by around 342 of depression
 # if mother has depression it increases chances by around 50%
-# if they had adverse life events up to age 3 it increases chances by ~22%
-# SDQ total difficulties at age 7 increases chances by around 4%
-# increase by 1 in average social discord score before 4 increases chances by 32%
-# being bullied at age 8 increases chances of depression by 58% 
-# being bullied at age 10 increases chances of depression by ~3 times though the effect decreases with time (by 6% with each extra year)
-# never feeling lonely at school at age 11 decreases chances by ~49%
-# an increase by 1 in friends average scores at ages 12-13 increase chance of depression by 8%
-# an increase by 1 in peer problem score at ages 12-13 leads to a increase in probably of depression by ~13%
+# if they had adverse life events up to age 3 it increases chances by ~21%
+# SDQ total difficulties at age 7 increases chances by around 5%
+# increase by 1 in average social discord score before 4 increases chances by 36%
+# being bullied at age 8 increases chances of depression by 60% 
+# being bullied at age 10 increases chances of depression by ~3.5 times though the effect decreases with time (by 6% with each extra year)
+# never feeling lonely at school at age 11 decreases chances by ~44%
+# an increase by 1 in friends average scores at ages 12-13 increase chance of depression by 12%
+# an increase by 1 in peer problem score at ages 12-13 leads to a increase in probably of depression by ~14%
 
 # the rest of the predictors include 1 in the credibility interval so there is no evidence they have an effect on the likelihood of depression
 # 

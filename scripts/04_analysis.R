@@ -31,6 +31,18 @@ alspac_long <- mutate(alspac_long,
                       age_l = ifelse(age >15 , 1, 0))
 
 
+# export names of new variables
+glimpse(alspac_long)
+
+alspac_long %>% 
+  select(bullying_victim_fct:adverse_life_events_score_to_age_3) %>% 
+  names() %>% 
+  as.data.frame() %>% 
+  set_names("New variables") %>% 
+  write.csv("./output/tabs/new_vars_created.csv")
+
+
+
 # make wide version of the data
 alspac_dep_w <- alspac_long %>% 
   select(uniqid, age, depression, anxiety, depression_smfq) %>% 
@@ -197,7 +209,7 @@ map_df(reg_sing, glance) %>%
 
 # run multilevel model with random intercept and slope at the individual 
 # level and with square time effects
-m_smfq_10 <- glmer(depression_smfq ~ 1 + age0 + I(age0^2) + 
+m_smfq_10 <- glmer(depression_smfq ~ 1 + age0 + I(age0^2) + female +
                      mother_education_age_gest +
                      healthy_very_8 +
                      mom_depression +
@@ -232,7 +244,7 @@ save(m_smfq_10, file = "./output/models/m_smfq_10.RData")
 
 
 # due to estimation issues we re-run the model using Bayesian estimation
-m_smfq_10_stan <- stan_glmer(depression_smfq ~ 1 + age0 + I(age0^2) + 
+m_smfq_10_stan <- stan_glmer(depression_smfq ~ 1 + age0 + I(age0^2) + female +
                                mother_education_age_gest +
                                healthy_very_8 +
                                mom_depression +
@@ -265,6 +277,72 @@ tidy(m_smfq_10_stan, exp = TRUE)
 glance(m_smfq_10_stan)
 
 save(m_smfq_10_stan, file = "./output/models/m_smfq_10_stan.RData")
+
+# load("./output/models/m_smfq_10_stan.RData")
+
+
+
+
+# theoretical model with 500 iterations
+m_smfq_10_stan_500 <- 
+  stan_glmer(depression_smfq ~ 1 + age0 + I(age0^2) + female +
+               mother_education_age_gest +
+               healthy_very_8 +
+               mom_depression +
+               adverse_life_events_score_to_age_3 +
+               adverse_life_events_score_age_4_to_8 +
+               SDQ_total_difficulties_age_6y9m +
+               family_maternal_bond_1 +
+               family_maternal_bond_3 +
+               social_cohesion_avg_0_3 +
+               social_discord_avg_0_3 +
+               social_cohesion_avg_5_7 +
+               social_discord_avg_5_7 +
+               bullied_8 + bullied_10 + 
+               friends_score_avg_8_10 +
+               peer_problem_avg_7_10 +
+               school_feel_lonely_never_11+
+               social_cohesion_avg_10 +
+               social_discord_avg_10 +
+               friends_score_avg_12_13 +
+               peer_problem_avg_12_13 + 
+               school_feel_lonely_never_14 +
+               age0:bullied_10  +
+               (1 + age0 | uniqid),
+             data = alspac_long, family = binomial(),
+             init_r = 0,
+             iter = 500)
+
+summary(m_smfq_10_stan_500)
+tidy(m_smfq_10_stan_500, exp = TRUE)
+glance(m_smfq_10_stan_500)
+
+save(m_smfq_10_stan_500, file = "./output/models/m_smfq_10_stan_500.RData")
+
+load("./output/models/m_smfq_10_stan_500.RData")
+
+
+left_join(tidy(m_smfq_10_stan_500), 
+          tidy(m_smfq_10_stan), by = "term") %>% 
+  mutate(dif = abs(estimate.x) - abs(estimate.y) %>% round(2)) %>% 
+  ggplot(aes(dif)) + geom_density()
+
+
+left_join(tidy(m_smfq_10_stan_500), 
+          tidy(m_smfq_10_stan), by = "term") %>% 
+  mutate(dif = abs(estimate.x) - abs(estimate.y) %>% round(2)) %>% 
+  View()
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Exploratory model building -----------------------------------
