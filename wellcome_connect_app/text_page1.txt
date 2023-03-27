@@ -13,33 +13,44 @@
 <h3>Control variables</h3>
 
 <ul>
-<li><strong>female</strong>: Participant assigned sex at birth (1 = female, 0 = male)</li>
-<li><strong>white</strong>: Child ethnic background</li>
-<li><strong>mom_edu_fct</strong>: mother’s education at 32 wks gest, categorical</li>
-<li><strong>mom_depression</strong>: if mother has severe depression at age 8</li>
-<li><strong>siblings</strong> if they have siblings are age 7</li>
-<li><strong>healthy_very_8</strong>: very healthy at age 8</li>
+<li><strong>Sex</strong>: Participant assigned sex at birth (1 = female, 0 = male)</li>
+<li><strong>Mother education</strong>: mother’s education at 32 wks gest, categorical</li>
+<li><strong>Mother depression</strong>: if mother has severe depression at age 8</li>
+<li><strong>SDQ</strong> at age 7</li>
+<li><strong>Health status at age 8</strong>: very healthy at age 8</li>
+<li><strong>Adverse life events</strong> at ages 1, 2, 3, 4, 5, 8</li>
 </ul>
 
 <h3>Key variables of interest</h3>
+ 
+<strong>Variables at age 0-3</strong>
 <ul>
-<li><strong>bullied_8</strong>: bullied at age 8, time constant (1 = Yes, 0 = No)</li>
-<li><strong>bullied_10</strong>: bullied at age 8, time constant (1 = Yes, 0 = No)</li>
-<li><strong>school_likes_teacher_always</strong>: they like teacher at ages 4, 5, 6 and 8, time constant (1 = Yes, 0 = No)</li>
-<li><strong>school_get_on_with_classmates_always</strong>: say they always get on with colleagues at ages 11 and 16, time constant (1 = Yes, 0 = No)</li>
-<li><strong>school_feel_lonely_never</strong>: they say they never feel lonely at school at ages 11 and 14, time constant (1 = Yes, 0 = No)</li>
-<li><strong>friends_score_avg</strong>: average friend score at ages 8, 10, 12, 13 and 17, time constant (continuous)</li>
-<li><strong>peer_problem_score_avg</strong>: peer problem score at ages 7, 8, 10, 12, 13 and 16, time constant (continuous)</li>
-<li><strong>friends_plays_with_kids_rev_stab</strong>: friends play with kids at age 1, time constant (0 = Never to 4 = Every day)</li>
-<li><strong>romantic_13</strong>: romantic in relationship or out with_someone at age 13, time varying (1 = Yes, 0 = No, ages below 13 fixed to 0)</li>
-<li><strong>family_maternal_bond_1</strong>: family maternal bond at age 1, time constant (continuous)</li>
-<li><strong>family_mother_satisfaction_with_partner_avg</strong>: mother satisfaction with partner averaged over ages 3, 6, 9, 12, time constant (continuous)</li>
-<li><strong>parent_networks_mother_social_support_score_avg</strong>: mother networks social support average score over ages -1, 0, 1, 2, 5, 6, 9, 12, time constant (continuous)</li>
-<li><strong>childcare_grandparent_looks_after_ch_0</strong>: grandparents offer childcare are age 0, time constant (1 = Yes, 0 = No)</li>
-<li><strong>religion_support_mother_avg</strong>: religion support mother averaged over ages -1, 5, 6, time constant (continuous between 0 and 1)</li>
-<li><strong>social_cohesion_avg</strong>: social cohesion score averaged over ages 0, 1, 2, 3, 5, 7, 10, 18, time constant (continuous)</li>
-<li><strong>social_discord_avg</strong>: social discord score averaged over ages 0, 1, 2, 3, 5, 7, 10, 18, time constant (continuous)</li>
-<li><strong>change_school_9</strong>: changed school at age 9</li>
-<li><strong>change_school_17</strong>: changed school at age 17</li>
-<li><strong>move_home_before8</strong>: if they moved home before 8</li>
+<li> Maternal bond (age 0)</li>
+<li> Maternal bond (age 3)</li>
+<li> Social cohesion (average of age 0 and 3)</li>
+<li> Social discord (average age 0 and 3) </li>
+</ul>
+
+<strong>Variables at age 4-7</strong>
+<ul>
+<li> Social cohesion (average age 5 and 7)</li>
+<li> Social discord (average age 5 and 7)</li>
+</ul>
+
+<strong>Variables at age 8-11</strong>
+<ul>
+<li> Bullied (age 8)</li>
+<li> Bullied (age 10)</li>
+<li> Friends score (average age 8 and 10) </li>
+<li> Peer problems (average age 7 and 10 </li>
+<li> School feels lonely never (age 11)</li>
+<li> Social cohesion (age 10)</li>
+<li> Social discord (age 10)</li>
+</ul>
+
+<strong>Variables at age 12-15</strong>
+<ul>
+<li> Friends score (average age 12 and 13) </li>
+<li> Peer problems (average age 12 and 13) </li>
+<li> School feels lonely never (age 14) </li>
 </ul>
